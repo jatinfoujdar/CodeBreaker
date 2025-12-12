@@ -15,11 +15,18 @@ struct CodeBreaker{
     var masterCode: Code = Code(kind: .master)
     var guess: Code = Code(kind: .guess)
     var attempts: [Code] = [Code]()
-    let pegChoices: [Peg] = [.red, .green, .blue, .yellow]
+    let pegChoices: [Peg]
+    
+    init(pegChoices : [Peg] = [.red, .green, .blue, .yellow]){
+        
+        self.pegChoices = pegChoices
+        masterCode.randomize(from: pegChoices)
+//        print(masterCode)
+    }
     
     mutating func attemptGuess() {
         var attempt = guess
-        attempt.kind = .attempt
+        attempt.kind = .attempt(guess.match(against: masterCode))
         attempts.append(attempt)
     }
     
@@ -38,17 +45,34 @@ struct CodeBreaker{
 
 struct Code{
     var kind: Kind
-    var pegs: [Peg] = [.green, .red, .blue, .yellow]
+    var pegs: [Peg] = Array(repeating: Code.missing, count: 4)
     
     static let missing: Peg = .clear
     
-    enum Kind{
+    
+    var matches: [Match]{
+        switch kind {
+        case .attempt(let matches): return matches
+        default: return []
+        }
+    }
+    
+    
+    enum Kind: Equatable{
         case master
         case guess
-        case attempt
+        case attempt([Match])
         case unknown
         
     }
+    
+    mutating func randomize(from pegChoices: [Peg]){
+        for index in pegChoices.indices{
+            pegs[index] = pegChoices.randomElement() ?? Code.missing
+        }
+    }
+    
+    
     
     
     func match(against otherCode: Code) -> [Match]{
