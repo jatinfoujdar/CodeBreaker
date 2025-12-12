@@ -17,18 +17,58 @@ struct CodeBreaker{
     var attempts: [Code] = [Code]()
     let pegChoices: [Peg] = [.red, .green, .blue, .yellow]
     
+    mutating func attemptGuess() {
+        var attempt = guess
+        attempt.kind = .attempt
+        attempts.append(attempt)
+    }
+    
+    
+    mutating func changeGuessPeg(at index : Int){
+        let existingPeg = guess.pegs[index]
+        if let indexOfExistingPegInPegChoisces = pegChoices.firstIndex(of: existingPeg){
+            
+            let newPeg = pegChoices[(indexOfExistingPegInPegChoisces + 1) % pegChoices.count]
+            guess.pegs[index] = newPeg
+        }else{
+            guess.pegs[index] = pegChoices.first ?? Code.missing
+        }
+    }
 }
 
 struct Code{
     var kind: Kind
-    var pegs: [Peg] = [.green, .red, .red, .yellow]
+    var pegs: [Peg] = [.green, .red, .blue, .yellow]
     
+    static let missing: Peg = .clear
     
     enum Kind{
         case master
         case guess
         case attempt
         case unknown
+        
+    }
+    
+    
+    func match(against otherCode: Code) -> [Match]{
+        var results: [Match] = Array(repeating: .nomatch, count: pegs.count)
+        var pegsToMatch = otherCode.pegs
+        for index in pegs.indices.reversed(){
+            if pegsToMatch.count > index, pegsToMatch[index] == pegs[index]{
+                results[index] = .exact
+                pegsToMatch.remove(at: index)
+            }
+        }
+        for index in pegs.indices{
+            if results[index] != .exact{
+                if let matchIndex = pegsToMatch.firstIndex(of: pegs[index]){
+                    results[index] = .inexact
+                    pegsToMatch.remove(at: matchIndex)
+                }
+            }
+        }
+        return results
     }
 }
 
