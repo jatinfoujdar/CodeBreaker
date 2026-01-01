@@ -21,7 +21,6 @@ struct CodeBreaker{
         
         self.pegChoices = pegChoices
         masterCode.randomize(from: pegChoices)
-//        print(masterCode)
     }
     
     mutating func attemptGuess() {
