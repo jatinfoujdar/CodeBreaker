@@ -7,7 +7,10 @@
 import SwiftUI
 
 struct MatchMaker: View{
-    var matches : [Match]
+    
+    let matches : [Match]
+    
+    //MARK: - Body
     var body: some View{
         HStack{
             VStack{
