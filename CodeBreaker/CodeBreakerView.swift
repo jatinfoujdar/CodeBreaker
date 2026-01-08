@@ -49,7 +49,7 @@ struct CodeBreakerView: View {
         .minimumScaleFactor(0.1)
     }
     
-    
+    // printf("attempedGuess")
     func view(for code : Code) -> some View{
         HStack{
             ForEach(code.pegs.indices, id: \.self){ index in
